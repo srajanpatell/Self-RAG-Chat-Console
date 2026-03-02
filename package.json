@@ -9,6 +9,9 @@
     "dev:web": "npm --workspace apps/web run dev",
     "dev:api": "npm --workspace apps/api run start:dev",
     "build:web": "npm --workspace apps/web run build",
-    "build:api": "npm --workspace apps/api run build"
+    "build:api": "npm --workspace apps/api run build",
+    "test:py": "pytest -q apps/chatbot/tests",
+    "test:api": "npm --workspace apps/api run test",
+    "test:web": "npm --workspace apps/web run test"
   }
 }

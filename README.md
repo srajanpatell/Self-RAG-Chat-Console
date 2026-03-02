@@ -151,6 +151,27 @@ Services:
 - `POST /ingest/text`
 - `POST /ingest/file`
 
+## Testing
+### Python (FastAPI / chatbot)
+```bash
+python3 -m pip install -r /home/developer/Desktop/Codex/apps/chatbot/requirements-test.txt
+python3 -m pytest /home/developer/Desktop/Codex/apps/chatbot/tests -vv
+```
+
+### JavaScript (NestJS API)
+```bash
+cd /home/developer/Desktop/Codex/apps/api
+corepack pnpm install
+corepack pnpm run test
+```
+
+### JavaScript (Next.js frontend)
+```bash
+cd /home/developer/Desktop/Codex/apps/web
+corepack pnpm install
+corepack pnpm run test
+```
+
 ## Example Workflow
 ### 1) Ingest text
 ```bash
