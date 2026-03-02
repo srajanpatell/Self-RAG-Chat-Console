@@ -1,0 +1,16 @@
+cd /home/developer/Desktop/Codex/apps/chatbot
+  set -a; source /home/developer/Desktop/Codex/.env; set +a
+  export DATABASE_URL=postgresql+asyncpg://
+  postgres@127.0.0.1:55432/rag_app
+  python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  # 2) NestJS backend
+  cd /home/developer/Desktop/Codex/apps/api
+  export CHATBOT_BASE_URL=http://127.0.0.1:8000
+  export PORT=3001
+  corepack pnpm run start:dev
+
+  # 3) Next.js frontend
+  cd /home/developer/Desktop/Codex/apps/web
+  export NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3001
+  corepack pnpm run dev

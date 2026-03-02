@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rag_app}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  chatbot:
+    build: ./apps/chatbot
+    container_name: rag-chatbot
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-rag_app}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-384}
+      PORT: ${CHATBOT_PORT:-8000}
+    depends_on:
+      - postgres
+      - ollama
+    ports:
+      - "${CHATBOT_PORT:-8000}:8000"
+
+  api:
+    build: ./apps/api
+    container_name: rag-api
+    env_file:
+      - .env
+    environment:
+      PORT: ${API_PORT:-3001}
+      CHATBOT_BASE_URL: ${CHATBOT_BASE_URL:-http://chatbot:8000}
+    depends_on:
+      - chatbot
+    ports:
+      - "${API_PORT:-3001}:3001"
+
+  web:
+    build: ./apps/web
+    container_name: rag-web
+    env_file:
+      - .env
+    environment:
+      PORT: ${WEB_PORT:-3000}
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3001}
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama-init:
+    image: curlimages/curl:8.10.1
+    container_name: rag-ollama-init
+    depends_on:
+      - ollama
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        until curl -s http://ollama:11434/api/tags > /dev/null; do sleep 2; done;
+        curl -s http://ollama:11434/api/pull -d '{"name":"${OLLAMA_MODEL:-llama3.2:3b}"}';
+    restart: "no"
+
+volumes:
+  pgdata:
+  ollama_data:
