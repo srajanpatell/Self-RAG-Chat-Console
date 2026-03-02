@@ -152,11 +152,28 @@ Services:
 - `POST /ingest/file`
 
 ## Testing
+All test suites added in this project:
+- Python (`pytest`): chatbot endpoint/unit and retrieval tests
+- JavaScript (`jest`): NestJS service/controller tests
+- JavaScript (`jest`): Next.js page smoke tests
+
+### Run all from project root
+```bash
+cd /home/developer/Desktop/Codex
+python3 -m pip install -r apps/chatbot/requirements-test.txt
+npm run test:py
+npm run test:api
+npm run test:web
+```
+
 ### Python (FastAPI / chatbot)
 ```bash
 python3 -m pip install -r /home/developer/Desktop/Codex/apps/chatbot/requirements-test.txt
 python3 -m pytest /home/developer/Desktop/Codex/apps/chatbot/tests -vv
 ```
+Coverage includes:
+- `tests/test_main.py`: `health`, `ingest_text`, `ingest_file`, `chat` no-context and with-context flows
+- `tests/test_retrieval.py`: chunking logic and hybrid score fusion
 
 ### JavaScript (NestJS API)
 ```bash
@@ -164,6 +181,11 @@ cd /home/developer/Desktop/Codex/apps/api
 corepack pnpm install
 corepack pnpm run test
 ```
+Coverage includes:
+- `test/chat.service.spec.ts`
+- `test/ingest.service.spec.ts`
+- `test/chat.controller.spec.ts`
+- `test/ingest.controller.spec.ts`
 
 ### JavaScript (Next.js frontend)
 ```bash
@@ -171,6 +193,8 @@ cd /home/developer/Desktop/Codex/apps/web
 corepack pnpm install
 corepack pnpm run test
 ```
+Coverage includes:
+- `__tests__/page.test.tsx` (UI smoke tests for key sections and initial empty state)
 
 ## Example Workflow
 ### 1) Ingest text
